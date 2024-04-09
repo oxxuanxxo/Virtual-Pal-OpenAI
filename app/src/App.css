@@ -11,9 +11,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -22,6 +24,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -39,4 +42,39 @@
 
 .read-the-docs {
   color: #888;
+}
+
+
+div .cs-message-list__typing-indicator-container div {
+  color: #000000;
+}
+
+div .cs-main-container,
+div .cs-chat-container .cs-message-input {
+  border: 0px;
+}
+
+div .cs-message--incoming .cs-message__content,
+div .cs-chat-container .cs-message-input,
+div .ps__thumb-y,
+div .ps__rail-y:hover .ps__thumb-y,
+div .ps__rail-y:active .ps__thumb-y {
+  background-color: #dad0ff;
+}
+
+div .cs-message-input__content-editor,
+div .cs-message-input__content-editor-wrapper,
+div .cs-message-list,
+div .ps__rail-y:hover,
+div .ps .ps__rail-y:hover,
+div .ps__rail-y {
+  background-color: #eaf3ff;
+}
+
+div .cs-message--outgoing .cs-message__content {
+  background-color: #b798ff;
+}
+
+div .cs-typing-indicator__dot {
+  background-color: #001679;
 }
