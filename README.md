@@ -2,6 +2,10 @@
 
 I've made a simple chat bot called Virtual Pal using OpenAI's API GPT-3.5 model, designed to offer an engaging and interactive conversation!
 
+[![Watch the video](https://github.com/oxxuanxxo/Virtual-Pal-OpenAI/assets/mainImage.png)](https://www.youtube.com/watch?v=Efeb2BVaXtI)
+
+![VPGIF](https://github.com/oxxuanxxo/Virtual-Pal-OpenAI/assets/72239739/87ece066-9cb4-497d-a71b-840a2c8d1b4e)
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
