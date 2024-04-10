@@ -1,45 +1,56 @@
-import { useState } from 'react';
 import './App.css'
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+
+import { useState } from 'react';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react'
 
-const API_KEY = "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";
+// For potetntial employers: if you need an API KEY to test out my App, do contact me!
+const API_KEY = "INSERT_API_KEY_HERE"; 
 
+// A system message for OpenAI that sets the context for the chatbot's responses.
 const systemMessage = {
   role: "system",
-  content: "Explain like I'm a bachelor's graduate with humble and polite tone. Keep the conversation friendly like a virtual pal/close friend, but also factual."
+  content: "Please provide explanations that are straightforward and easy to understand, using everyday language. Aim for a tone that's friendly and engaging, as if you're talking to a friend who's knowledgeable but approachable. Keep the explanations accurate and grounded in facts."
 }
 
 function App() {
-  const [typing, setTyping] = useState(false);
-  const [messages, setMessages] = useState([
+  // Tracking whether the bot is typing, its for typing indicator use
+  const [typing, isTyping] = useState(false);
+
+  // contains the array of message objects, containing messages, sender and direction of message (for chatscope use)
+  const [messages, updateMessages] = useState([
     {
-      message: "Hey! I'm your virtual pal, ask me anything!",
+      message: "Hey! I'm your Virtual Pal, ask me anything!",
       sender: "ChatGPT",
       direction: "incoming"
     }
   ])
 
-  const handleSend = async (message) => {
+  // when message is send, this event will be triggered, to store the messages into the array and process it
+  const sentEvent = async (message) => {
+
+    // creating a new message object with the message sent by the user
     const newMessage = {
       message: message,
       sender: "user",
       direction: "outgoing"
     }
-
+    // appending the new message to the existing messages array
     const newMessages = [...messages, newMessage];
 
-    //update our messages state
+    // updating the messages state with the new array of messages
+    updateMessages(newMessages);
 
-    setMessages(newMessages);
-    //set typing indicator
-    setTyping(true);
+    isTyping(true);
 
-    //process messsage to chatgpt
-    await processMessageToChatGPT(newMessages);
+    // process messsage to openai, to generate a response 
+    // await is used here because of the async function
+    await processMsgToOpenAI(newMessages);
   }
 
-  async function processMessageToChatGPT(chatMessages) {
+  // function to process messages and send them to the OpenAI API
+  async function processMsgToOpenAI(chatMessages) {
+    // Mapping the chatMessages to the format expected by the OpenAI API
     let apiMessages = chatMessages.map((messageObject) => {
       let role = "";
       if (messageObject.sender === "ChatGPT") {
@@ -51,9 +62,8 @@ function App() {
       return { role: role, content: messageObject.message }
     });
 
-
-
-    const apiRequestBody = {
+    // the template of the request required by OpenAI API
+    const apiRequestMsg = {
       "model": "gpt-3.5-turbo",
       "messages": [
         systemMessage,
@@ -61,33 +71,38 @@ function App() {
       ]
     }
 
+    // making an asynchronous POST request to the OpenAI API
     await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": "Bearer " + API_KEY,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(apiRequestBody)
+      body: JSON.stringify(apiRequestMsg)
     }).then((data) => {
       if (!data.ok) {
-        throw new Error(`HTTP error! status: ${data.status}`);
+        throw new Error(`Error! status: ${data.status}`);
       }
       return data.json();
     }).then((data) => {
-      console.log(data);
+      if (!data.ok) {
+        throw new Error(`Error! status: ${data.status}`);
+      }
+      // creating a new message object for the response from OpenAI
       const chatGPTResponse = {
         message: data.choices[0].message.content,
         sender: "ChatGPT",
-        direction: "incoming" // Messages from ChatGPT will be incoming
+        direction: "incoming" 
       };
-
-      setMessages([...chatMessages, chatGPTResponse]);
-      setTyping(false);
+      // updating the messages state with the new OpenAI response
+      updateMessages([...chatMessages, chatGPTResponse]);
+      isTyping(false);
     }).catch((error) => {
       console.error("Error fetching data: ", error);
     });
   }
 
+  // Rendering the chat interface via chatscope API
   return (
     <div className="App">
        <div className="header" style={{ 
@@ -106,13 +121,12 @@ function App() {
             <MessageList autoScrollToBottom={true} scrollBehavior="auto" typingIndicator={typing ? <TypingIndicator content="ChatGPT is typing" /> : null} >
               {
                 messages.map((message, i) => {
-                  // Adjust the 'direction' and 'position' of the message based on the sender
                   const position = message.sender === "ChatGPT" ? "incoming" : "outgoing";
                   return <Message key={i} model={{ ...message, position: position }} />;
                 })
               }
             </MessageList>
-            <MessageInput placeholder='Type Message Here' onSend={handleSend} attachButton={false} />
+            <MessageInput placeholder='Type Message Here' onSend={sentEvent} attachButton={false} />
           </ChatContainer>
         </MainContainer>
       </div>
