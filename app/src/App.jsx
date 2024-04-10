@@ -14,8 +14,8 @@ const systemMessage = {
 }
 
 function App() {
-  // Tracking whether the bot is typing, its for typing indicator use
-  const [typing, isTyping] = useState(false);
+  // Tracking whether the bot is isTyping, its for isTyping indicator use
+  const [isTyping, setIsTyping] = useState(false);
 
   // contains the array of message objects, containing messages, sender and direction of message (for chatscope use)
   const [messages, updateMessages] = useState([
@@ -41,7 +41,7 @@ function App() {
     // updating the messages state with the new array of messages
     updateMessages(newMessages);
 
-    isTyping(true);
+    setIsTyping(true);
 
     // process messsage to openai, to generate a response 
     // await is used here because of the async function
@@ -85,9 +85,6 @@ function App() {
       }
       return data.json();
     }).then((data) => {
-      if (!data.ok) {
-        throw new Error(`Error! status: ${data.status}`);
-      }
       // creating a new message object for the response from OpenAI
       const chatGPTResponse = {
         message: data.choices[0].message.content,
@@ -96,7 +93,7 @@ function App() {
       };
       // updating the messages state with the new OpenAI response
       updateMessages([...chatMessages, chatGPTResponse]);
-      isTyping(false);
+      setIsTyping(false);
     }).catch((error) => {
       console.error("Error fetching data: ", error);
     });
@@ -118,7 +115,7 @@ function App() {
       <div style={{ position: "relative", height: "800px", width: "700px" }}>
         <MainContainer>
           <ChatContainer className='my-chat-container'> 
-            <MessageList autoScrollToBottom={true} scrollBehavior="auto" typingIndicator={typing ? <TypingIndicator content="ChatGPT is typing" /> : null} >
+            <MessageList autoScrollToBottom={true} scrollBehavior="auto" typingIndicator={isTyping ? <TypingIndicator content="ChatGPT is isTyping" /> : null} >
               {
                 messages.map((message, i) => {
                   const position = message.sender === "ChatGPT" ? "incoming" : "outgoing";
